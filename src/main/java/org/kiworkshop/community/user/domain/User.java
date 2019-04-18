@@ -25,14 +25,18 @@ public class User {
   private String password;
   private String email;
 
-  @OneToMany
-  @JoinColumn(name = "USER_ID")
-  private List<Post> posts;
+//  @OneToMany
+//  @JoinColumn(name = "USER_ID")
+//  private List<Post> posts;
 
   public User(SaveUserParams params) {
     this.name = params.getName();
     this.password = params.getPassword();
     this.email = params.getEmail();
+  }
+
+  public boolean matchPassword(String password) {
+    return this.password.equals(password);
   }
 
 }

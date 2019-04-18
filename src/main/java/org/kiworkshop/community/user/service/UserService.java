@@ -1,16 +1,20 @@
 package org.kiworkshop.community.user.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.kiworkshop.community.user.domain.User;
+import org.kiworkshop.community.user.dto.LoginUserParams;
 import org.kiworkshop.community.user.dto.request.SaveUserParams;
 import org.kiworkshop.community.user.dto.response.UserDetailResponse;
 import org.kiworkshop.community.user.dto.response.UserListResponse;
 import org.kiworkshop.community.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserService {
   private final UserRepository userRepository;
@@ -30,4 +34,15 @@ public class UserService {
     return userRepository.findById(userId).orElseThrow(RuntimeException::new);
   }
 
+  public void login(LoginUserParams userParams, HttpSession session) {
+    String email = userParams.getEmail();
+    // FIXME: 2019-04-19 throw custom exception
+    User user = userRepository.findByEmail(email).orElseThrow(RuntimeException::new);
+    if (user.matchPassword(userParams.getPassword())) {
+      log.info("Password matches! ");
+      session.setAttribute("LOGIN_USER", user);
+      return;
+    }
+    throw new RuntimeException();
+  }
 }
