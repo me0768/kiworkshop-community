@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.kiworkshop.community.user.dto.request.SaveUserParams;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.util.List;
@@ -41,8 +42,8 @@ public class User {
     this.email = email;
   }
 
-  public boolean matchPassword(String password) {
-    return this.password.equals(password);
+  public boolean matchPassword(String password, PasswordEncoder passwordEncoder) {
+    return passwordEncoder.matches(password, this.password);
   }
 
 }

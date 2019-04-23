@@ -41,8 +41,8 @@ public class UserService {
     String email = userParams.getEmail();
     // FIXME: 2019-04-19 throw custom exception
     User user = userRepository.findByEmail(email).orElseThrow(RuntimeException::new);
-    if (user.matchPassword(userParams.getPassword())) {
-      log.info("Password matches! ");
+    if (user.matchPassword(userParams.getPassword(), bCryptPasswordEncoder)) {
+      log.info("로그인 성공! userParams={}", userParams);
       session.setAttribute("LOGIN_USER", user);
       return;
     }
