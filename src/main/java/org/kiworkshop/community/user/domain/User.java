@@ -35,6 +35,12 @@ public class User {
     this.email = params.getEmail();
   }
 
+  public User(String name, String password, String email) {
+    this.name = name;
+    this.password = password;
+    this.email = email;
+  }
+
   public boolean matchPassword(String password) {
     return this.password.equals(password);
   }

@@ -8,6 +8,7 @@ import org.kiworkshop.community.user.dto.request.SaveUserParams;
 import org.kiworkshop.community.user.dto.response.UserDetailResponse;
 import org.kiworkshop.community.user.dto.response.UserListResponse;
 import org.kiworkshop.community.user.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -18,10 +19,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
   private final UserRepository userRepository;
+  private final PasswordEncoder bCryptPasswordEncoder;
 
   public Long saveUser(SaveUserParams params) {
-    User user = userRepository.save(new User(params));
-    return user.getId();
+    String encodedPassword = bCryptPasswordEncoder.encode(params.getPassword());
+    User user = new User(params.getName(), encodedPassword, params.getEmail());
+    return userRepository.save(user).getId();
   }
 
   public UserListResponse getUsers() {
