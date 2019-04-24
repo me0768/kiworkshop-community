@@ -7,6 +7,8 @@ import org.kiworkshop.community.user.dto.LoginUserParams;
 import org.kiworkshop.community.user.dto.request.SaveUserParams;
 import org.kiworkshop.community.user.dto.response.UserDetailResponse;
 import org.kiworkshop.community.user.dto.response.UserListResponse;
+import org.kiworkshop.community.user.exception.PasswordMismatchException;
+import org.kiworkshop.community.user.exception.UserNotFoundException;
 import org.kiworkshop.community.user.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,18 +36,18 @@ public class UserService {
   }
 
   public User findUserById(Long userId) {
-    return userRepository.findById(userId).orElseThrow(RuntimeException::new);
+    return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
   }
 
   public void login(LoginUserParams userParams, HttpSession session) {
     String email = userParams.getEmail();
     // FIXME: 2019-04-19 throw custom exception
-    User user = userRepository.findByEmail(email).orElseThrow(RuntimeException::new);
+    User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
     if (user.matchPassword(userParams.getPassword(), bCryptPasswordEncoder)) {
       log.info("로그인 성공! userParams={}", userParams);
       session.setAttribute("LOGIN_USER", user);
       return;
     }
-    throw new RuntimeException();
+    throw new PasswordMismatchException();
   }
 }

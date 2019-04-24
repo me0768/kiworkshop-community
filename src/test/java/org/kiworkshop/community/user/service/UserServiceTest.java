@@ -5,6 +5,8 @@ import org.junit.runner.RunWith;
 import org.kiworkshop.community.user.domain.User;
 import org.kiworkshop.community.user.dto.LoginUserParams;
 import org.kiworkshop.community.user.dto.request.SaveUserParams;
+import org.kiworkshop.community.user.exception.PasswordMismatchException;
+import org.kiworkshop.community.user.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -40,7 +42,24 @@ public class UserServiceTest {
   }
 
   @Test
-  public void login_fail() {
+  public void login_fail_email_조회_실패() {
+    /* Given */
+    String name = "myang";
+    String password = "mm";
+    String email = "myang@myang.com";
+    SaveUserParams saveUserParams = new SaveUserParams(name, password, email);
+    Long userId = userService.saveUser(saveUserParams);
+
+    LoginUserParams loginUserParams = new LoginUserParams("myang@zum.com", password);
+    /* Then: 로그인에 실패하면 Runtime exception throw */
+    assertThatExceptionOfType(UserNotFoundException.class).isThrownBy(() -> {
+      /* when: userService.login을 호출하여 로그인 시도 */
+      userService.login(loginUserParams, session);
+    });
+
+  }
+  @Test
+  public void login_fail_password_mismatch() {
     /* Given */
     String name = "myang";
     String password = "mm";
@@ -50,7 +69,7 @@ public class UserServiceTest {
 
     LoginUserParams loginUserParams = new LoginUserParams(email, "unknownPAssword");
     /* Then: 로그인에 실패하면 Runtime exception throw */
-    assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
+    assertThatExceptionOfType(PasswordMismatchException.class).isThrownBy(() -> {
       /* when: userService.login을 호출하여 로그인 시도 */
       userService.login(loginUserParams, session);
     });
